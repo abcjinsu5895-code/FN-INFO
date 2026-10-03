@@ -16,6 +16,7 @@ from email.utils import parsedate_to_datetime
 
 import insight  # AI 해설 만드는 부분 (insight.py)
 import market   # 지표 가져오는 부분 (market.py)
+import signals  # 규칙 기반 신호 해석 (signals.py)
 
 # ------------------------------------------------------------
 # [설정] 여기만 바꾸면 관심사를 바꿀 수 있어요
@@ -75,6 +76,43 @@ WORLD = {
 
 MAX_PER_TOPIC = 1  # 한 주제에서 최대 몇 개까지 (다양하게 보려고 1개)
 
+# 전쟁·지정학: 하루 한 번이 아니라 3시간마다(실행할 때마다) 새로 골라요.
+# 분쟁 상황이 바뀌면 topics의 검색어만 고치면 돼요.
+WAR_KOREA = {
+    "edition": "hl=ko&gl=KR&ceid=KR:ko",
+    "how_many": 2,
+    "max_per_topic": 2,
+    "recency": 3,  # 최신 기사에 가산점을 더 크게
+    "topics": {
+        "휴전·종전": "휴전 OR 종전 OR 평화협상 OR 정전",
+        "중동": "이란 OR 호르무즈 OR 헤즈볼라 OR 이스라엘 공습",
+        "우크라이나": "우크라이나 러시아 전쟁",
+    },
+    "keywords": {
+        "휴전": 5, "종전": 5, "정전": 4, "평화": 3, "합의": 3, "협상": 3, "결렬": 4,
+        "호르무즈": 4, "봉쇄": 3, "공습": 2, "재개": 2, "미사일": 2,
+        "이란": 2, "트럼프": 1, "유가": 2,
+        "[포토]": -10, "포토": -3, "부고": -10,
+    },
+}
+WAR_WORLD = {
+    "edition": "hl=en-US&gl=US&ceid=US:en",
+    "how_many": 2,
+    "max_per_topic": 2,
+    "recency": 3,
+    "topics": {
+        "휴전·종전": "ceasefire OR truce OR peace talks OR peace deal",
+        "중동": "Iran OR Hormuz OR Hezbollah",
+        "우크라이나": "Ukraine Russia war",
+    },
+    "keywords": {
+        "ceasefire": 5, "truce": 5, "peace deal": 5, "peace talks": 4, "agreement": 3,
+        "collapse": 4, "talks": 2, "Hormuz": 4, "blockade": 3, "strikes": 2,
+        "resume": 2, "missile": 2, "oil": 2,
+        "podcast": -5, "video": -3, "live updates": -1,
+    },
+}
+
 # ------------------------------------------------------------
 # 아래부터는 동작 부분 (안 건드려도 돼요)
 # ------------------------------------------------------------
@@ -118,7 +156,7 @@ def fetch_topic(topic, query, edition):
     return items
 
 
-def score(article, keywords):
+def score(article, keywords, recency=1):
     """제목을 보고 점수를 매겨요."""
     s = 0
     title = article["title"].lower()
@@ -127,7 +165,7 @@ def score(article, keywords):
             s += point
     if article["published"]:  # 최근 기사일수록 약간 가산점
         hours_ago = (datetime.now(KST) - article["published"]).total_seconds() / 3600
-        s += max(0, 3 - hours_ago / 8)
+        s += recency * max(0, 3 - hours_ago / 8)
     return s
 
 
@@ -138,7 +176,7 @@ def collect(region):
         articles += fetch_topic(topic, query, region["edition"])
 
     for a in articles:
-        a["score"] = score(a, region["keywords"])
+        a["score"] = score(a, region["keywords"], region.get("recency", 1))
     articles.sort(key=lambda a: a["score"], reverse=True)
 
     chosen, seen, topic_count = [], set(), {}
@@ -146,14 +184,14 @@ def collect(region):
         key = a["title"].replace(" ", "").lower()[:18]  # 앞부분 같으면 같은 기사
         if key in seen or a["score"] < 0:
             continue
-        if topic_count.get(a["topic"], 0) >= MAX_PER_TOPIC:
+        if topic_count.get(a["topic"], 0) >= region.get("max_per_topic", MAX_PER_TOPIC):
             continue
         seen.add(key)
         topic_count[a["topic"]] = topic_count.get(a["topic"], 0) + 1
         chosen.append({
             "topic": a["topic"], "title": a["title"], "link": a["link"],
             "source": a["source"],
-            "time": a["published"].strftime("%H:%M") if a["published"] else "",
+            "time": a["published"].strftime("%m/%d %H:%M") if a["published"] else "",
         })
         if len(chosen) == region["how_many"]:
             break
@@ -167,7 +205,17 @@ def load_news():
     return None
 
 
-def get_news(now, indicators):
+def get_war():
+    """전쟁·지정학 최신 기사 (실행할 때마다 새로)"""
+    out, seen = [], set()
+    for a in collect(WAR_KOREA) + collect(WAR_WORLD):
+        if a["link"] not in seen:
+            seen.add(a["link"])
+            out.append(a)
+    return out
+
+
+def get_news(now, indicators, found, war):
     """오늘 기사가 이미 있으면 그대로, 없으면(7시 이후) 새로 골라요. 해설도 같이."""
     saved = load_news()
     today = now.strftime("%Y-%m-%d")
@@ -187,7 +235,7 @@ def get_news(now, indicators):
             "korea": collect(KOREA),
             "world": collect(WORLD),
         }
-    news["insight"] = insight.make_insight(indicators, news, today)
+    news["insight"] = insight.make_insight(indicators, news, today, found, war)
     news["insight_time"] = now.strftime("%H:%M")
     with open(NEWS_FILE, "w", encoding="utf-8") as f:
         json.dump(news, f, ensure_ascii=False, indent=1)
@@ -296,11 +344,31 @@ def make_market(data):
     return "".join(out)
 
 
+def make_signals(found):
+    """규칙으로 찾은 신호 카드"""
+    if not found:
+        body = '\n    <p class="empty">오늘은 평소 범위를 벗어난 뚜렷한 신호가 없어요. 시장이 비교적 잠잠한 상태예요.</p>'
+    else:
+        cards = []
+        for f in found:
+            ev = "".join(f"<li>{esc(e)}</li>" for e in f["evidence"])
+            cards.append(f"""
+    <article class="sig {esc(f['tone'])}">
+      <h3>{esc(f['title'])}</h3>
+      <p>{esc(f['say'])}</p>
+      <ul class="ev">{ev}</ul>
+      <p class="watch-line">볼 것: {esc(f['watch'])}</p>
+    </article>""")
+        body = "".join(cards)
+    return f"""<section class="signals">
+    <div class="head"><h2>오늘의 신호 <small>최근 {signals.WINDOW}거래일 변화 기준, 규칙 해석</small></h2></div>{body}
+  </section>"""
+
+
 def make_insight(news):
     ins = news.get("insight")
     if not ins:
-        return ('<section class="insight"><p class="empty">AI 해설은 GitHub에 '
-                'ANTHROPIC_API_KEY를 등록하면 매일 아침 여기에 나타나요.</p></section>')
+        return ""  # AI 키가 없으면 해설 칸은 숨겨요 (규칙 신호는 그대로 보여요)
     paras = "".join(f"\n    <p>{esc(p)}</p>" for p in ins.get("situation", []))
     inds = "".join(
         f"\n      <li><b>{esc(i.get('name', ''))}</b> {esc(i.get('comment', ''))}</li>"
@@ -320,13 +388,16 @@ def make_insight(news):
   </section>"""
 
 
-def make_page(news, indicators, now):
+def make_page(news, indicators, found, war, now):
     with open("template.html", encoding="utf-8") as f:
         template = f.read()
     date_text = f"{now.month}월 {now.day}일 {'월화수목금토일'[now.weekday()]}요일"
     page = (template
             .replace("{{DATE}}", date_text)
             .replace("{{INSIGHT}}", make_insight(news))
+            .replace("{{SIGNALS}}", make_signals(found))
+            .replace("{{WAR}}", make_rows(war))
+            .replace("{{WAR_TIME}}", now.strftime("%H:%M"))
             .replace("{{MARKET_TIME}}", now.strftime("%H:%M"))
             .replace("{{NEWS_TIME}}", news["updated"])
             .replace("{{MARKET}}", make_market(indicators))
@@ -340,4 +411,6 @@ def make_page(news, indicators, now):
 if __name__ == "__main__":
     now = datetime.now(KST)
     indicators = market.get_all()
-    make_page(get_news(now, indicators), indicators, now)
+    found = signals.detect(indicators)
+    war = get_war()
+    make_page(get_news(now, indicators, found, war), indicators, found, war, now)
