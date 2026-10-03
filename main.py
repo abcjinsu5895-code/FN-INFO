@@ -1,7 +1,7 @@
 # ============================================================
 #  내 거시경제 페이지 만들기
 #   - 지표(환율, 유가, 미국채 등): 실행할 때마다(3시간마다) 새로
-#   - 기사(국내 3 + 해외 3): 하루 한 번, 아침 8시 이후 첫 실행 때
+#   - 기사(국내 3 + 해외 3) + AI 해설: 하루 한 번, 아침 7시 이후 첫 실행 때
 #  (추가 설치 필요 없음)
 # ============================================================
 
@@ -14,13 +14,14 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
-import market  # 지표 가져오는 부분 (market.py)
+import insight  # AI 해설 만드는 부분 (insight.py)
+import market   # 지표 가져오는 부분 (market.py)
 
 # ------------------------------------------------------------
 # [설정] 여기만 바꾸면 관심사를 바꿀 수 있어요
 # ------------------------------------------------------------
 
-NEWS_HOUR = 8  # 기사는 매일 이 시각(한국 시간) 이후 첫 실행 때 새로 골라요
+NEWS_HOUR = 7  # 기사는 매일 이 시각(한국 시간) 이후 첫 실행 때 새로 골라요
 
 # 국내: 한국어 구글 뉴스
 KOREA = {
@@ -166,26 +167,38 @@ def load_news():
     return None
 
 
-def get_news(now):
-    """오늘 기사가 이미 있으면 그대로, 없으면(8시 이후) 새로 골라요."""
+def get_news(now, indicators):
+    """오늘 기사가 이미 있으면 그대로, 없으면(7시 이후) 새로 골라요. 해설도 같이."""
     saved = load_news()
     today = now.strftime("%Y-%m-%d")
     if saved and (saved["date"] == today or now.hour < NEWS_HOUR):
+        news = saved
         print("[기사] 저장된 기사 사용")
-        return saved
-    print("[기사] 새로 고르는 중")
-    news = {
-        "date": today,
-        "updated": now.strftime("%m월 %d일 %H:%M"),
-        "korea": collect(KOREA),
-        "world": collect(WORLD),
-    }
+        if news.get("insight"):
+            return news
+        # 해설만 빠져 있으면(키를 나중에 넣은 경우 등) 해설만 다시 시도
+        if news["date"] != today:
+            return news
+    else:
+        print("[기사] 새로 고르는 중")
+        news = {
+            "date": today,
+            "updated": now.strftime("%m월 %d일 %H:%M"),
+            "korea": collect(KOREA),
+            "world": collect(WORLD),
+        }
+    news["insight"] = insight.make_insight(indicators, news, today)
+    news["insight_time"] = now.strftime("%H:%M")
     with open(NEWS_FILE, "w", encoding="utf-8") as f:
         json.dump(news, f, ensure_ascii=False, indent=1)
     return news
 
 
 # ---------- 웹페이지 조각 만들기 ----------
+
+def esc(text):
+    return html.escape(str(text))
+
 
 def make_rows(chosen):
     if not chosen:
@@ -194,9 +207,9 @@ def make_rows(chosen):
     for a in chosen:
         rows.append(f"""
       <li>
-        <span class="tag">{html.escape(a['topic'])}</span>
-        <a href="{html.escape(a['link'])}" target="_blank" rel="noopener">{html.escape(a['title'])}</a>
-        <span class="meta">{html.escape(a['source'])} {a['time']}</span>
+        <span class="tag">{esc(a['topic'])}</span>
+        <a href="{esc(a['link'])}" target="_blank" rel="noopener">{esc(a['title'])}</a>
+        <span class="meta">{esc(a['source'])} {a['time']}</span>
       </li>""")
     return "".join(rows)
 
@@ -213,8 +226,9 @@ def direction(change):
     return "up" if v > 0 else "down" if v < 0 else "flat"
 
 
-def sparkline(values, css_class):
-    """숫자 목록으로 작은 선 그래프(SVG)를 그려요."""
+def sparkline(trend, css_class, unit, digits):
+    """시점 정보가 들어 있는 작은 선 그래프(SVG). 마우스를 올리면 값이 보여요."""
+    values = trend["values"]
     w, h, pad = 300, 64, 4
     lo, hi = min(values), max(values)
     span = (hi - lo) or 1
@@ -223,45 +237,87 @@ def sparkline(values, css_class):
         f"{i * step:.1f},{pad + (h - 2 * pad) * (1 - (v - lo) / span):.1f}"
         for i, v in enumerate(values)
     )
-    return (f'<svg class="spark {css_class}" viewBox="0 0 {w} {h}" preserveAspectRatio="none" '
-            f'aria-hidden="true"><polyline points="{pts}" fill="none" '
-            f'stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" '
-            f'stroke-linejoin="round"/></svg>')
+    data_t = esc(json.dumps(trend["times"], ensure_ascii=False))
+    data_v = esc(json.dumps(values))
+    return (f'<div class="plot"><svg class="spark {css_class}" viewBox="0 0 {w} {h}" '
+            f'preserveAspectRatio="none" data-t="{data_t}" data-v="{data_v}" '
+            f'data-unit="{esc(unit)}" data-d="{digits}">'
+            f'<polyline points="{pts}" fill="none" stroke="currentColor" stroke-width="2" '
+            f'vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>'
+            f'<span class="vline"></span><span class="dot {css_class}"></span>'
+            f'<span class="tip" role="status"></span></div>')
 
 
-def make_rates(data):
-    cells = []
-    for it in data["rates"]:
-        cells.append(f"""
-      <div class="cell rate">
-        <span class="name">{html.escape(it['name'])}</span>
-        <span class="value">{html.escape(it['value'])}</span>
-      </div>""")
-    return "".join(cells)
-
-
-def make_quotes(data):
+def make_cell(it):
     labels = {"5d": "5일", "3mo": "3개월"}
-    cells = []
-    for it in data["quotes"]:
-        change = ""
-        if it["change"]:
-            change = f'<span class="chg {direction(it["change"])}">전일 대비 {html.escape(it["change"])}</span>'
-        charts = ""
-        for key, tr in it["trends"].items():
-            d = direction(tr["change"])
-            charts += f"""
-        <div class="trend r-{key}">
-          {sparkline(tr['values'], d)}
-          <span class="chg {d}">{labels.get(key, key)} {html.escape(tr['change'])}</span>
+    change = ""
+    if it.get("change"):
+        change = f'<span class="chg {direction(it["change"])}">전일 대비 {esc(it["change"])}</span>'
+    elif it.get("note"):
+        change = f'<span class="chg flat">{esc(it["note"])}</span>'
+    charts = ""
+    for key in ("5d", "3mo"):
+        tr = it["trends"].get(key)
+        if not tr:
+            continue
+        d = direction(tr["change"])
+        charts += f"""
+          <div class="trend r-{key}">
+            {sparkline(tr, d, it['unit'], it['digits'])}
+            <span class="chg {d}">{labels[key]} {esc(tr['change'])}</span>
+          </div>"""
+    return f"""
+        <div class="cell">
+          <span class="name">{esc(it['name'])}</span>
+          <span class="value">{esc(it['value'])}</span>
+          {change}{charts}
         </div>"""
-        cells.append(f"""
-      <div class="cell quote">
-        <span class="name">{html.escape(it['name'])}</span>
-        <span class="value">{html.escape(it['value'])}</span>
-        {change}{charts}
-      </div>""")
-    return "".join(cells)
+
+
+def make_market(data):
+    """묶음(금리/환율/주식/원자재·심리)별로 지표 칸을 만들어요."""
+    out = []
+    for g in data["groups"]:
+        rates = ""
+        if g["name"] == "금리":
+            rates = '\n        <div class="rates">' + "".join(
+                f"""
+          <div class="cell rate">
+            <span class="name">{esc(r['name'])}</span>
+            <span class="value">{esc(r['value'])}</span>
+          </div>""" for r in data["rates"]) + "\n        </div>"
+        cells = "".join(make_cell(it) for it in g["items"])
+        out.append(f"""
+    <div class="group">
+      <h3 class="gname">{esc(g['name'])}</h3>
+      <div class="market">{rates}{cells}
+      </div>
+    </div>""")
+    return "".join(out)
+
+
+def make_insight(news):
+    ins = news.get("insight")
+    if not ins:
+        return ('<section class="insight"><p class="empty">AI 해설은 GitHub에 '
+                'ANTHROPIC_API_KEY를 등록하면 매일 아침 여기에 나타나요.</p></section>')
+    paras = "".join(f"\n    <p>{esc(p)}</p>" for p in ins.get("situation", []))
+    inds = "".join(
+        f"\n      <li><b>{esc(i.get('name', ''))}</b> {esc(i.get('comment', ''))}</li>"
+        for i in ins.get("indicators", []))
+    watch = "".join(
+        f"\n      <li><b>{esc(w.get('title', ''))}</b><span>{esc(w.get('why', ''))}</span></li>"
+        for w in ins.get("watch", []))
+    return f"""<section class="insight">
+    <div class="head"><h2>오늘의 해설 <small>AI 작성, {esc(news.get('insight_time', ''))} 지표 기준</small></h2></div>
+    <p class="lead">{esc(ins.get('headline', ''))}</p>{paras}
+    <h3>지표 읽기</h3>
+    <ul class="reads">{inds}
+    </ul>
+    <h3>앞으로 볼 것</h3>
+    <ol class="watch">{watch}
+    </ol>
+  </section>"""
 
 
 def make_page(news, indicators, now):
@@ -270,10 +326,10 @@ def make_page(news, indicators, now):
     date_text = f"{now.month}월 {now.day}일 {'월화수목금토일'[now.weekday()]}요일"
     page = (template
             .replace("{{DATE}}", date_text)
+            .replace("{{INSIGHT}}", make_insight(news))
             .replace("{{MARKET_TIME}}", now.strftime("%H:%M"))
             .replace("{{NEWS_TIME}}", news["updated"])
-            .replace("{{RATES}}", make_rates(indicators))
-            .replace("{{QUOTES}}", make_quotes(indicators))
+            .replace("{{MARKET}}", make_market(indicators))
             .replace("{{KOREA}}", make_rows(news["korea"]))
             .replace("{{WORLD}}", make_rows(news["world"])))
     with open("index.html", "w", encoding="utf-8") as f:
@@ -283,4 +339,5 @@ def make_page(news, indicators, now):
 
 if __name__ == "__main__":
     now = datetime.now(KST)
-    make_page(get_news(now), market.get_all(), now)
+    indicators = market.get_all()
+    make_page(get_news(now, indicators), indicators, now)
