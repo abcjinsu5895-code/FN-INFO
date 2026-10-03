@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>오늘의 거시경제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E8EDF1; --ink: #13202B; --muted: #5A6A77; --line: #C9D3DB;
+    --accent: #1F5E73; --tag-bg: #D3E1E8; --up: #C2362F; --down: #2459B8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10171D; --ink: #E3E9EE; --muted: #8D9BA6; --line: #26323C;
+      --accent: #7FB6C9; --tag-bg: #1C2C36; --up: #F07A72; --down: #7EA6F0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.6;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  }
+  main { max-width: 680px; margin: 0 auto; padding: 56px 22px 64px; }
+  .label { color: var(--accent); font-weight: 500; font-size: 15px; margin: 0 0 6px; }
+  h1 { font-size: clamp(38px, 10vw, 60px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 40px; }
+  section { margin-bottom: 44px; }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  h2 { font-size: 15px; font-weight: 700; margin: 0; }
+  h2 small { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+
+  .range { display: flex; gap: 4px; }
+  .range button {
+    font: inherit; font-size: 13px; color: var(--muted); background: none;
+    border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; cursor: pointer;
+  }
+  .range button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); font-weight: 500; }
+  .range button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .market { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); column-gap: 24px; border-top: 2px solid var(--ink); }
+  .rates { display: flex; gap: 32px; padding: 14px 0; border-bottom: 1px solid var(--line); grid-column: 1 / -1; }
+  .cell { padding: 14px 0 16px; border-bottom: 1px solid var(--line); }
+  .rates .cell { padding: 0; border: 0; }
+  .name { display: block; color: var(--muted); font-size: 14px; }
+  .value { display: block; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .rate .value { font-size: 20px; }
+  .chg { display: block; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--muted); }
+  .trend { margin-top: 10px; }
+  .spark { display: block; width: 100%; height: 48px; }
+  body[data-range="5d"] .r-3mo, body[data-range="3mo"] .r-5d { display: none; }
+
+  ol { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+  li { padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .tag { display: inline-block; font-size: 13px; font-weight: 500; color: var(--accent); background: var(--tag-bg); padding: 2px 10px; border-radius: 4px; margin-bottom: 8px; }
+  li a { display: block; color: var(--ink); text-decoration: none; font-size: 19px; font-weight: 500; line-height: 1.45; }
+  li a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  li a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .meta { display: block; color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .empty { color: var(--muted); }
+</style>
+</head>
+<body data-range="5d">
+<main>
+  <p class="label">오늘의 거시경제</p>
+  <h1>{{DATE}}</h1>
+
+  <section>
+    <div class="head">
+      <h2>주요 지표 <small>{{MARKET_TIME}} 기준</small></h2>
+      <div class="range" role="group" aria-label="추이 기간">
+        <button type="button" data-r="5d" aria-pressed="true">5일</button>
+        <button type="button" data-r="3mo" aria-pressed="false">3개월</button>
+      </div>
+    </div>
+    <div class="market">
+      <div class="rates">{{RATES}}
+      </div>{{QUOTES}}
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>국내 <small>{{NEWS_TIME}} 선정</small></h2></div>
+    <ol>{{KOREA}}
+    </ol>
+  </section>
+
+  <section>
+    <div class="head"><h2>해외</h2></div>
+    <ol>{{WORLD}}
+    </ol>
+  </section>
+</main>
+<script>
+  document.querySelectorAll(".range button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.body.dataset.range = b.dataset.r;
+      document.querySelectorAll(".range button").forEach(function (x) {
+        x.setAttribute("aria-pressed", String(x === b));
+      });
+    });
+  });
+</script>
+</body>
+</html>
