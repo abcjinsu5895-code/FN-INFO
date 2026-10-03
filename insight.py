@@ -20,6 +20,8 @@ SYSTEM_PROMPT = """너는 개인 투자자에게 매일 아침 거시경제 브�
 원칙:
 - 아래에 주어진 지표 숫자와 기사 제목만 근거로 써. 주어지지 않은 숫자나 사실을 지어내지 마.
 - 기사는 제목만 있으니, 제목에서 확실히 알 수 있는 것 이상은 단정하지 말고 "~로 보인다" 정도로 써.
+- [규칙으로 감지된 신호]는 미리 정한 규칙으로 찾은 것이니, 이를 출발점으로 삼되 기사와 엮어 우선순위를 정해줘.
+- 전쟁·지정학 기사(휴전, 종전 협상 등)가 유가, 금, 달러, 증시에 어떻게 반영되고 있는지 반드시 짚어줘.
 - 지표들 사이의 연결(예: 금리와 환율, 유가와 물가, 미국채 금리와 주가)을 짚어서 "그래서 지금 무슨 국면인지"를 설명해.
 - 특정 종목 매수/매도 같은 투자 권유는 하지 마.
 - 쉬운 한국어로, 경제 기사를 즐겨 읽는 일반인이 이해할 수 있게 써.
@@ -38,7 +40,7 @@ SYSTEM_PROMPT = """너는 개인 투자자에게 매일 아침 거시경제 브�
 # ------------------------------------------------------------
 
 
-def _describe(indicators, news, today):
+def _describe(indicators, news, today, found=None, war=None):
     """AI에게 보여줄 오늘의 자료를 글로 정리해요."""
     lines = [f"오늘 날짜: {today}", "", "[기준금리]"]
     for r in indicators["rates"]:
@@ -57,14 +59,21 @@ def _describe(indicators, news, today):
                     parts.append(f"{label} 변화 {t['change']} "
                                  f"(기간 최저 {min(t['values']):,.2f}, 최고 {max(t['values']):,.2f})")
             lines.append(f"- {q['name']}: " + ", ".join(parts))
-    for label, key in (("국내 기사", "korea"), ("해외 기사", "world")):
+    lines += ["", "[규칙으로 감지된 신호]"]
+    for f in found or []:
+        lines.append(f"- {f['title']}: {f['say']} (근거: {', '.join(f['evidence'])})")
+    if not found:
+        lines.append("- 없음 (평소 범위 안에서 움직임)")
+    for label, items in (("전쟁·지정학 최신 기사", war or []),
+                         ("국내 경제 기사", news.get("korea", [])),
+                         ("해외 경제 기사", news.get("world", []))):
         lines += ["", f"[{label}]"]
-        for a in news.get(key, []):
-            lines.append(f"- ({a['topic']}) {a['title']} / {a['source']}")
+        for a in items:
+            lines.append(f"- ({a['topic']}) {a['title']} / {a['source']} {a.get('time', '')}")
     return "\n".join(lines)
 
 
-def make_insight(indicators, news, today):
+def make_insight(indicators, news, today, found=None, war=None):
     key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
     if not key:
         print("[해설] API 키가 없어서 건너뜀")
@@ -74,7 +83,7 @@ def make_insight(indicators, news, today):
         "model": MODEL,
         "max_tokens": 2000,
         "system": SYSTEM_PROMPT,
-        "messages": [{"role": "user", "content": _describe(indicators, news, today)}],
+        "messages": [{"role": "user", "content": _describe(indicators, news, today, found, war)}],
     }
     req = urllib.request.Request(
         "https://api.anthropic.com/v1/messages",
