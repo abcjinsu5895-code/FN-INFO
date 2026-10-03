@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>오늘의 거시경제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E8EDF1; --ink: #13202B; --muted: #5A6A77; --line: #C9D3DB;
+    --accent: #1F5E73; --tag-bg: #D3E1E8; --up: #C2362F; --down: #2459B8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #10171D; --ink: #E3E9EE; --muted: #8D9BA6; --line: #26323C;
+      --accent: #7FB6C9; --tag-bg: #1C2C36; --up: #F07A72; --down: #7EA6F0;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    line-height: 1.6;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  }
+  main { max-width: 680px; margin: 0 auto; padding: 56px 22px 64px; }
+  .label { color: var(--accent); font-weight: 500; font-size: 15px; margin: 0 0 6px; }
+  h1 { font-size: clamp(38px, 10vw, 60px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 40px; }
+  section { margin-bottom: 44px; }
+  .head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  h2 { font-size: 15px; font-weight: 700; margin: 0; }
+  h2 small { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+
+  .range { display: flex; gap: 4px; }
+  .range button {
+    font: inherit; font-size: 13px; color: var(--muted); background: none;
+    border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; cursor: pointer;
+  }
+  .range button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); font-weight: 500; }
+  .range button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .market { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); column-gap: 24px; border-top: 2px solid var(--ink); }
+  .rates { display: flex; gap: 32px; padding: 14px 0; border-bottom: 1px solid var(--line); grid-column: 1 / -1; }
+  .cell { padding: 14px 0 16px; border-bottom: 1px solid var(--line); }
+  .rates .cell { padding: 0; border: 0; }
+  .name { display: block; color: var(--muted); font-size: 14px; }
+  .value { display: block; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .rate .value { font-size: 20px; }
+  .chg { display: block; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--muted); }
+  .trend { margin-top: 10px; }
+  .spark { display: block; width: 100%; height: 48px; }
+  body[data-range="5d"] .r-3mo, body[data-range="3mo"] .r-5d { display: none; }
+
+  ol { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+  li { padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .tag { display: inline-block; font-size: 13px; font-weight: 500; color: var(--accent); background: var(--tag-bg); padding: 2px 10px; border-radius: 4px; margin-bottom: 8px; }
+  li a { display: block; color: var(--ink); text-decoration: none; font-size: 19px; font-weight: 500; line-height: 1.45; }
+  li a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  li a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .meta { display: block; color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .empty { color: var(--muted); }
+</style>
+</head>
+<body data-range="5d">
+<main>
+  <p class="label">오늘의 거시경제</p>
+  <h1>10월 3일 토요일</h1>
+
+  <section>
+    <div class="head">
+      <h2>주요 지표 <small>15:26 기준</small></h2>
+      <div class="range" role="group" aria-label="추이 기간">
+        <button type="button" data-r="5d" aria-pressed="true">5일</button>
+        <button type="button" data-r="3mo" aria-pressed="false">3개월</button>
+      </div>
+    </div>
+    <div class="market">
+      <div class="rates">
+      <div class="cell rate">
+        <span class="name">한국 기준금리</span>
+        <span class="value">3.00%</span>
+      </div>
+      <div class="cell rate">
+        <span class="name">미국 기준금리</span>
+        <span class="value">-</span>
+      </div>
+      </div>
+      <div class="cell quote">
+        <span class="name">미국 10년물</span>
+        <span class="value">5.28%</span>
+        <span class="chg up">전일 대비 +4bp</span>
+        <div class="trend r-5d">
+          <svg class="spark up" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,44.1 8.8,43.2 17.6,32.4 26.5,33.3 35.3,42.3 44.1,40.6 52.9,39.8 61.8,42.3 70.6,35.0 79.4,23.4 88.2,22.1 97.1,17.8 105.9,27.7 114.7,33.3 123.5,41.5 132.4,31.1 141.2,24.2 150.0,21.2 158.8,13.0 167.6,14.8 176.5,16.9 185.3,5.7 194.1,4.0 202.9,26.0 211.8,39.3 220.6,50.5 229.4,40.2 238.2,41.0 247.1,58.3 255.9,60.0 264.7,34.6 273.5,31.1 282.4,23.8 291.2,21.2 300.0,23.8" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg up">5일 +5bp</span>
+        </div>
+        <div class="trend r-3mo">
+          <svg class="spark up" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,59.6 4.7,60.0 9.4,56.6 14.1,53.8 18.8,55.9 23.4,53.8 28.1,51.1 32.8,52.7 37.5,55.5 42.2,53.8 46.9,55.7 51.6,51.8 56.2,49.7 60.9,47.8 65.6,44.6 70.3,46.2 75.0,48.9 79.7,51.4 84.4,50.2 89.1,47.3 93.8,41.7 98.4,45.8 103.1,49.8 107.8,50.5 112.5,46.9 117.2,47.5 121.9,44.9 126.6,45.9 131.2,46.0 135.9,48.9 140.6,45.1 145.3,43.1 150.0,44.4 154.7,48.0 159.4,45.1 164.1,42.2 168.8,44.5 173.4,49.0 178.1,47.3 182.8,46.7 187.5,43.4 192.2,40.8 196.9,38.2 201.6,38.2 206.2,40.5 210.9,39.0 215.6,37.5 220.3,35.4 225.0,28.0 229.7,25.9 234.4,26.8 239.1,24.4 243.8,23.7 248.4,27.8 253.1,24.3 257.8,26.7 262.5,26.4 267.2,16.3 271.9,13.0 276.6,11.5 281.2,7.6 285.9,6.6 290.6,4.0 295.3,7.9 300.0,5.1" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg up">3개월 +79bp</span>
+        </div>
+      </div>
+      <div class="cell quote">
+        <span class="name">원/달러</span>
+        <span class="value">1,342.5 원</span>
+        <span class="chg down">전일 대비 -17.3 (-1.3%)</span>
+        <div class="trend r-5d">
+          <svg class="spark down" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,27.8 2.5,25.8 5.1,15.4 7.6,24.3 10.2,25.8 12.7,22.9 15.3,12.7 17.8,11.4 20.3,18.9 22.9,18.4 25.4,20.3 28.0,17.9 30.5,19.2 33.1,20.8 35.6,21.3 38.1,17.7 40.7,19.1 43.2,21.5 45.8,19.5 48.3,19.2 50.8,16.5 53.4,19.3 55.9,18.5 58.5,18.5 61.0,18.0 63.6,19.4 66.1,19.3 68.6,19.3 71.2,21.0 73.7,20.8 76.3,25.3 78.8,24.1 81.4,24.4 83.9,26.7 86.4,25.2 89.0,31.1 91.5,32.5 94.1,32.5 96.6,30.1 99.2,27.4 101.7,30.4 104.2,30.4 106.8,29.4 109.3,34.7 111.9,34.6 114.4,38.2 116.9,37.3 119.5,35.6 122.0,38.2 124.6,22.7 127.1,23.2 129.7,29.0 132.2,30.1 134.7,31.0 137.3,32.0 139.8,31.9 142.4,38.7 144.9,38.4 147.5,29.9 150.0,31.8 152.5,30.1 155.1,36.3 157.6,33.1 160.2,28.6 162.7,29.4 165.3,28.6 167.8,28.6 170.3,29.7 172.9,26.8 175.4,26.1 178.0,26.4 180.5,27.1 183.1,24.0 185.6,18.6 188.1,16.2 190.7,19.2 193.2,19.8 195.8,22.5 198.3,17.4 200.8,20.2 203.4,14.3 205.9,13.8 208.5,4.0 211.0,11.5 213.6,16.9 216.1,15.4 218.6,17.2 221.2,16.2 223.7,6.5 226.3,8.9 228.8,12.9 231.4,18.6 233.9,19.5 236.4,21.8 239.0,18.5 241.5,17.8 244.1,15.9 246.6,8.8 249.2,18.9 251.7,21.2 254.2,24.0 256.8,27.2 259.3,37.5 261.9,40.2 264.4,51.7 266.9,49.7 269.5,46.7 272.0,44.9 274.6,48.3 277.1,56.2 279.7,53.4 282.2,55.8 284.7,51.7 287.3,51.8 289.8,51.7 292.4,54.0 294.9,57.1 297.5,60.0 300.0,60.0" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg down">5일 -13.4 (-1.0%)</span>
+        </div>
+        <div class="trend r-3mo">
+          <svg class="spark down" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,4.0 4.5,6.5 9.0,9.5 13.4,10.1 17.9,12.4 22.4,16.8 26.9,16.1 31.3,18.0 35.8,18.3 40.3,20.8 44.8,21.3 49.3,23.2 53.7,21.0 58.2,24.2 62.7,23.0 67.2,24.1 71.6,24.5 76.1,28.7 80.6,27.0 85.1,30.0 89.6,32.8 94.0,38.6 98.5,34.6 103.0,36.5 107.5,36.5 111.9,38.4 116.4,38.1 120.9,42.1 125.4,39.4 129.9,40.8 134.3,39.6 138.8,39.5 143.3,39.9 147.8,40.1 152.2,40.4 156.7,46.8 161.2,46.4 165.7,47.9 170.1,49.0 174.6,48.9 179.1,48.3 183.6,49.1 188.1,50.0 192.5,52.8 197.0,51.1 201.5,54.9 206.0,55.7 210.4,58.4 214.9,58.8 219.4,60.0 223.9,60.0 228.4,57.6 232.8,58.6 237.3,58.3 241.8,53.6 246.3,50.1 250.7,49.4 255.2,48.0 259.7,50.9 264.2,57.1 268.7,53.9 273.1,52.6 277.6,56.0 282.1,54.6 286.6,57.0 291.0,55.3 295.5,54.4 300.0,59.1" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg down">3개월 -209.3 (-13.5%)</span>
+        </div>
+      </div>
+      <div class="cell quote">
+        <span class="name">WTI 유가</span>
+        <span class="value">91.11 달러</span>
+        <span class="chg down">전일 대비 -1.76 (-1.9%)</span>
+        <div class="trend r-5d">
+          <svg class="spark down" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,20.3 2.8,18.5 5.6,24.8 8.3,18.0 11.1,8.4 13.9,6.2 16.7,4.0 19.4,5.9 22.2,18.9 25.0,21.9 27.8,8.2 30.6,13.0 33.3,27.8 36.1,30.3 38.9,32.1 41.7,26.8 44.4,26.4 47.2,26.0 50.0,27.3 52.8,24.4 55.6,24.0 58.3,22.3 61.1,19.9 63.9,18.4 66.7,20.1 69.4,21.1 72.2,25.3 75.0,31.1 77.8,32.5 80.6,37.5 83.3,42.8 86.1,45.8 88.9,44.8 91.7,41.7 94.4,49.2 97.2,46.9 100.0,51.0 102.8,56.1 105.6,58.5 108.3,60.0 111.1,57.2 113.9,58.9 116.7,56.7 119.4,55.3 122.2,54.7 125.0,53.3 127.8,55.5 130.6,55.7 133.3,53.8 136.1,54.9 138.9,50.6 141.7,50.3 144.4,47.4 147.2,47.1 150.0,49.0 152.8,46.1 155.6,39.5 158.3,42.8 161.1,44.3 163.9,46.7 166.7,47.2 169.4,47.7 172.2,49.2 175.0,50.9 177.8,51.7 180.6,48.4 183.3,48.9 186.1,55.0 188.9,58.5 191.7,58.9 194.4,55.4 197.2,45.1 200.0,33.2 202.8,31.6 205.6,34.6 208.3,41.1 211.1,39.3 213.9,40.7 216.7,41.7 219.4,36.6 222.2,31.2 225.0,35.3 227.8,25.0 230.6,29.5 233.3,26.3 236.1,29.3 238.9,28.1 241.7,28.8 244.4,27.3 247.2,28.9 250.0,31.6 252.8,31.5 255.6,32.1 258.3,32.5 261.1,39.0 263.9,50.1 266.7,56.9 269.4,58.1 272.2,56.5 275.0,55.4 277.8,57.3 280.6,56.3 283.3,55.1 286.1,44.4 288.9,39.7 291.7,40.7 294.4,43.2 297.2,39.9 300.0,42.1" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg down">5일 -2.81 (-3.0%)</span>
+        </div>
+        <div class="trend r-3mo">
+          <svg class="spark up" viewBox="0 0 300 64" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,60.0 4.8,57.2 9.5,52.5 14.3,54.7 19.0,55.7 23.8,45.6 28.6,43.8 33.3,43.4 38.1,44.4 42.9,39.1 47.6,37.9 52.4,35.4 57.1,32.5 61.9,24.5 66.7,28.8 71.4,38.9 76.2,43.9 81.0,36.1 85.7,37.4 90.5,35.8 95.2,42.3 100.0,49.2 104.8,50.0 109.5,46.9 114.3,45.5 119.0,39.6 123.8,38.0 128.6,37.9 133.3,40.9 138.1,39.2 142.9,36.0 147.6,35.4 152.4,34.0 157.1,31.0 161.9,32.2 166.7,35.3 171.4,39.3 176.2,39.5 181.0,37.5 185.7,37.7 190.5,34.1 195.2,27.4 200.0,26.3 204.8,25.8 209.5,25.6 214.3,23.2 219.0,18.7 223.8,9.0 228.6,12.7 233.3,10.7 238.1,4.0 242.9,9.1 247.6,9.9 252.4,12.3 257.1,19.1 261.9,20.9 266.7,24.5 271.4,20.9 276.2,24.2 281.0,23.9 285.7,28.7 290.5,27.1 295.2,23.5 300.0,26.1" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>
+          <span class="chg up">3개월 +22.56 (+32.9%)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><h2>국내 <small>10월 03일 15:26 선정</small></h2></div>
+    <ol>
+      <li>
+        <span class="tag">성장</span>
+        <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQaFZXZnZZb3ZZZk9iOVJwWlIzTTBRT1BKUURQYXl6Wm84UUhDSXRKMVhxY0V6VkhpcmRpNzAyYm4yLUwyandEOGk1SEJ6b1RHc0RFRzZZRXJWU05ocnljY0lzb2hueHJIZ244Ykk0c2xwM0lZcXE1b2k3ZktpRVRyS3Uwb2V5Y3dHMWRPMW9TaVlNYkpvdG1RaVFkSGxZX0VpaEZVa1RBSXdncDRUOF9zc2ExRlJaQQ?oc=5" target="_blank" rel="noopener">국채 금리 대 GDP 성장률: 40조 달러 국가부채가 아직 나선형으로 늘지 않는 이유</a>
+        <span class="meta">IndexBox 06:42</span>
+      </li>
+      <li>
+        <span class="tag">환율</span>
+        <a href="https://news.google.com/rss/articles/CBMickFVX3lxTE02azRsUE1wNFU0OHBybDBKZmxjX1RhTWlGR2ZwUGZ6UTB0RTdlWVlYR1dUbjQ4YWhkLU9OM3ZuSTlOMG14MHdxMU5KSnVqSzJjR0U5R0ZwVHlqTHZsSWxNcUcyWWZrYmduWkN1cFozYVdKdw?oc=5" target="_blank" rel="noopener">[단독] 신페트로달러 판도 변화 직면 =&gt; 에너지 패권 재편과 킹달러 공습 &gt; 트럼프 파월 의장 정조준 격돌 파문 -&gt; 연준 독립성 침해 논란 일파만파 &gt;&gt; 국채금리 폭등 속 원달러 환율 요동 = 금융시장 트리플 발작 경보 발령</a>
+        <span class="meta">데일리머니 00:15</span>
+      </li>
+      <li>
+        <span class="tag">금리</span>
+        <a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE5JMDBIZ0g2OVpBZjBxczlMTkhxa2g4RDBLbktiSC1xM2ZuTk5pZ1QzT0wwNkJ4dEZJRG1fSzk2RU8zSjljTW1iQkNtNWhTQWhFSjVqcHh2NUxCSEFublNhT0RLMU5DbzhYQXVRMFoteGZ6ajRv?oc=5" target="_blank" rel="noopener">&quot;10월 연준·한은 금리 동결할 것…달러-원 1,345~1,370원 전망&quot; |</a>
+        <span class="meta">연합인포맥스 07:44</span>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="head"><h2>해외</h2></div>
+    <ol>
+      <li>
+        <span class="tag">금리</span>
+        <a href="https://news.google.com/rss/articles/CBMi1wFBVV95cUxNa012YXV2UkRsY3huSzYzeWoxLW1NWkZUMlNlbEprZ1JNeEt2NEpIWHNob3hiVllyZHVWczRrWmdfY1VEMWVsSGkyUGdQb0xBR2ZCMDU0Y09yM1NnUXZCNVQ3WUt4ZjR5a2NlalhEd25iMVNJR2ljTk53SGMwQkxEWnJYVEUzbTJjLU9RNkNrWGIzMUdCejNFak1RRngwY2thcFQwVnphcHN0Ym1CZFlEdXZIdnRpaEdEYWgzSWdXWHl0d2h2a2lYQ1FVaHBxUU5QRjB1eXB5UQ?oc=5" target="_blank" rel="noopener">Rupiah strengthens against US dollar as easing inflation data cools Federal Reserve rate hike expectations</a>
+        <span class="meta">streamlinefeed.co.ke 20:55</span>
+      </li>
+      <li>
+        <span class="tag">물가</span>
+        <a href="https://news.google.com/rss/articles/CBMiZEFVX3lxTE1CdnlqUVdvNEJpbXZYTnNyVC0zQ19DYktlTm9xQlhrbFRUOW9jVkp2VHBqbHRibEdOLUhQRFN3SHNneVhsXzJ3WTVkbnlueFhidWVDZDFObFRTRGl5VkNkZkF6UTM?oc=5" target="_blank" rel="noopener">Fed Interest Rates May Rise Again as AI Fuels Inflation</a>
+        <span class="meta">Briefs Finance 08:58</span>
+      </li>
+      <li>
+        <span class="tag">중앙은행</span>
+        <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxOa1l6ZDNRTkp2M0Ewek1NUnpmSTV6R25kRGQ1aGlUaXRSMzZYVTBGeUdBeXp0b2lNdUxNbHNQM2hfTmtPdEx5VU9tUmdHMm1IYjlra2NfaUZpWW9pSTJKUVFMR3JNUmRNZ0V2NGpIRjNSSEU2Q0ZXcHhCbHdPTWlKSlZoOTRYSHdxY29zc0VfZXF1WW1BcHVZXw?oc=5" target="_blank" rel="noopener">Japan Inflation Outlook: BOJ Rate Hike, Yen and Policy Path</a>
+        <span class="meta">equiti.com 22:31</span>
+      </li>
+    </ol>
+  </section>
+</main>
+<script>
+  document.querySelectorAll(".range button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.body.dataset.range = b.dataset.r;
+      document.querySelectorAll(".range button").forEach(function (x) {
+        x.setAttribute("aria-pressed", String(x === b));
+      });
+    });
+  });
+</script>
+</body>
+</html>
