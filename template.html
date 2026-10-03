@@ -9,12 +9,12 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #E8EDF1; --ink: #13202B; --muted: #5A6A77; --line: #C9D3DB;
+    --bg: #E8EDF1; --ink: #13202B; --muted: #5A6A77; --line: #C9D3DB; --card: #F4F7F9;
     --accent: #1F5E73; --tag-bg: #D3E1E8; --up: #C2362F; --down: #2459B8;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #10171D; --ink: #E3E9EE; --muted: #8D9BA6; --line: #26323C;
+      --bg: #10171D; --ink: #E3E9EE; --muted: #8D9BA6; --line: #26323C; --card: #18222A;
       --accent: #7FB6C9; --tag-bg: #1C2C36; --up: #F07A72; --down: #7EA6F0;
     }
   }
@@ -28,11 +28,32 @@
   main { max-width: 680px; margin: 0 auto; padding: 56px 22px 64px; }
   .label { color: var(--accent); font-weight: 500; font-size: 15px; margin: 0 0 6px; }
   h1 { font-size: clamp(38px, 10vw, 60px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 40px; }
-  section { margin-bottom: 44px; }
+  section { margin-bottom: 48px; }
   .head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
   h2 { font-size: 15px; font-weight: 700; margin: 0; }
   h2 small { font-weight: 400; color: var(--muted); font-size: 13px; margin-left: 6px; }
+  .empty { color: var(--muted); }
 
+  /* 해설 */
+  .insight { border-top: 2px solid var(--ink); padding-top: 18px; }
+  .insight .head { margin-bottom: 4px; }
+  .insight .lead { font-size: 22px; font-weight: 700; line-height: 1.45; letter-spacing: -0.01em; margin: 6px 0 18px; }
+  .insight p { font-size: 17px; line-height: 1.8; margin: 0 0 14px; max-width: 38em; }
+  .insight h3 { font-size: 15px; font-weight: 700; margin: 28px 0 8px; }
+  .reads { list-style: none; margin: 0; padding: 0; }
+  .reads li { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 16px; line-height: 1.7; }
+  .reads b { font-weight: 700; margin-right: 6px; }
+  .watch { margin: 0; padding: 0; list-style: none; counter-reset: w; }
+  .watch li { counter-increment: w; position: relative; padding: 14px 16px 14px 52px; margin-bottom: 8px; background: var(--card); border-radius: 6px; }
+  .watch li::before {
+    content: counter(w); position: absolute; left: 16px; top: 13px;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: var(--bg);
+    font-size: 13px; font-weight: 700; display: grid; place-items: center;
+  }
+  .watch b { display: block; font-size: 16px; font-weight: 700; }
+  .watch span { display: block; font-size: 15px; line-height: 1.7; color: var(--muted); margin-top: 2px; }
+
+  /* 지표 */
   .range { display: flex; gap: 4px; }
   .range button {
     font: inherit; font-size: 13px; color: var(--muted); background: none;
@@ -40,8 +61,9 @@
   }
   .range button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); font-weight: 500; }
   .range button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  .market { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); column-gap: 24px; border-top: 2px solid var(--ink); }
+  .group { margin-top: 18px; }
+  .gname { font-size: 14px; font-weight: 700; color: var(--accent); margin: 0 0 6px; }
+  .market { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); column-gap: 24px; border-top: 2px solid var(--ink); }
   .rates { display: flex; gap: 32px; padding: 14px 0; border-bottom: 1px solid var(--line); grid-column: 1 / -1; }
   .cell { padding: 14px 0 16px; border-bottom: 1px solid var(--line); }
   .rates .cell { padding: 0; border: 0; }
@@ -51,23 +73,34 @@
   .chg { display: block; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; }
   .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--muted); }
   .trend { margin-top: 10px; }
-  .spark { display: block; width: 100%; height: 48px; }
+  .plot { position: relative; }
+  .spark { display: block; width: 100%; height: 48px; touch-action: pan-y; cursor: crosshair; }
+  .vline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--muted); opacity: 0; pointer-events: none; }
+  .dot { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: currentColor; opacity: 0; pointer-events: none; }
+  .tip {
+    position: absolute; bottom: calc(100% + 4px); left: 0; white-space: nowrap;
+    background: var(--ink); color: var(--bg); font-size: 12px; font-weight: 500;
+    padding: 3px 8px; border-radius: 4px; opacity: 0; pointer-events: none; font-variant-numeric: tabular-nums;
+  }
+  .plot.on .vline, .plot.on .dot, .plot.on .tip { opacity: 1; }
   body[data-range="5d"] .r-3mo, body[data-range="3mo"] .r-5d { display: none; }
 
-  ol { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
-  li { padding: 22px 0; border-bottom: 1px solid var(--line); }
+  /* 기사 */
+  ol.news { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+  ol.news li { padding: 22px 0; border-bottom: 1px solid var(--line); }
   .tag { display: inline-block; font-size: 13px; font-weight: 500; color: var(--accent); background: var(--tag-bg); padding: 2px 10px; border-radius: 4px; margin-bottom: 8px; }
-  li a { display: block; color: var(--ink); text-decoration: none; font-size: 19px; font-weight: 500; line-height: 1.45; }
-  li a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  li a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  ol.news a { display: block; color: var(--ink); text-decoration: none; font-size: 19px; font-weight: 500; line-height: 1.45; }
+  ol.news a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  ol.news a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .meta { display: block; color: var(--muted); font-size: 14px; margin-top: 6px; }
-  .empty { color: var(--muted); }
 </style>
 </head>
 <body data-range="5d">
 <main>
   <p class="label">오늘의 거시경제</p>
   <h1>{{DATE}}</h1>
+
+  {{INSIGHT}}
 
   <section>
     <div class="head">
@@ -77,25 +110,23 @@
         <button type="button" data-r="3mo" aria-pressed="false">3개월</button>
       </div>
     </div>
-    <div class="market">
-      <div class="rates">{{RATES}}
-      </div>{{QUOTES}}
-    </div>
+    {{MARKET}}
   </section>
 
   <section>
     <div class="head"><h2>국내 <small>{{NEWS_TIME}} 선정</small></h2></div>
-    <ol>{{KOREA}}
+    <ol class="news">{{KOREA}}
     </ol>
   </section>
 
   <section>
     <div class="head"><h2>해외</h2></div>
-    <ol>{{WORLD}}
+    <ol class="news">{{WORLD}}
     </ol>
   </section>
 </main>
 <script>
+  // 5일 / 3개월 전환
   document.querySelectorAll(".range button").forEach(function (b) {
     b.addEventListener("click", function () {
       document.body.dataset.range = b.dataset.r;
@@ -103,6 +134,37 @@
         x.setAttribute("aria-pressed", String(x === b));
       });
     });
+  });
+
+  // 그래프에 마우스를 올리면(폰은 손가락으로 좌우로 밀면) 그 시점의 값 보여주기
+  document.querySelectorAll(".plot").forEach(function (plot) {
+    var svg = plot.querySelector("svg");
+    var times = JSON.parse(svg.dataset.t), vals = JSON.parse(svg.dataset.v);
+    var unit = svg.dataset.unit, digits = Number(svg.dataset.d);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    var vline = plot.querySelector(".vline"), dot = plot.querySelector(".dot"), tip = plot.querySelector(".tip");
+
+    function fmt(v) {
+      var s = v.toLocaleString("ko-KR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+      return unit === "%" ? s + "%" : (unit ? s + " " + unit : s);
+    }
+    function show(e) {
+      var r = svg.getBoundingClientRect();
+      var x = Math.min(Math.max(e.clientX - r.left, 0), r.width);
+      var i = Math.round(x / r.width * (vals.length - 1));
+      var px = i / (vals.length - 1) * r.width;
+      var py = (4 + 56 * (1 - (vals[i] - lo) / span)) / 64 * r.height;
+      vline.style.left = px + "px";
+      dot.style.left = px + "px";
+      dot.style.top = py + "px";
+      tip.textContent = times[i] + "  " + fmt(vals[i]);
+      var w = tip.offsetWidth;
+      tip.style.left = Math.min(Math.max(px - w / 2, 0), r.width - w) + "px";
+      plot.classList.add("on");
+    }
+    svg.addEventListener("pointermove", show);
+    svg.addEventListener("pointerdown", show);
+    svg.addEventListener("pointerleave", function () { plot.classList.remove("on"); });
   });
 </script>
 </body>
