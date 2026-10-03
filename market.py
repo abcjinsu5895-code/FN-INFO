@@ -1,12 +1,14 @@
 # ============================================================
-#  주요 지표 가져오기: 한국/미국 기준금리, 미국 10년물, 환율, 유가
-#  + 시장 지표는 추이(5일 시간별 / 3개월 일별)까지 가져와요
+#  주요 지표 가져오기
+#   - 기준금리: 한국, 미국
+#   - 시장 지표: 금리 / 환율 / 주식 / 원자재·심리 (+ 5일·3개월 추이)
 # ============================================================
 
 import csv
 import io
 import json
 import os
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -24,17 +26,33 @@ KOREA_RATE_FALLBACK = 3.00
 # 미국 기준금리 예비값 (하단, 상단): 온라인에서 못 가져올 때만 써요. (2026-09-16 인상 기준)
 US_RATE_FALLBACK = (3.75, 4.00)
 
-# 야후 파이낸스에서 가져올 시세 (표시 이름: (종목코드, 단위, 소수점))
-QUOTES = {
-    "미국 10년물": ("^TNX", "%", 2),
-    "원/달러": ("KRW=X", "원", 1),
-    "WTI 유가": ("CL=F", "달러", 2),
-}
-
-# 추이 기간 (이름: (야후 기간, 간격))
-TREND_RANGES = {
-    "5d": ("5d", "60m"),    # 최근 5일, 1시간 간격
-    "3mo": ("3mo", "1d"),   # 최근 3개월, 하루 간격
+# 야후 파이낸스에서 가져올 시세, 묶음별로 정리
+#   "표시 이름": (종목코드, 단위, 소수점)
+#   단위가 "%"면 금리로 보고 변화를 bp(0.01%p)로 보여줘요.
+GROUPS = {
+    "금리": {
+        "미국 10년물": ("^TNX", "%", 2),
+        "미국 2년물": ("2YY=F", "%", 2),
+    },
+    "환율": {
+        "원/달러": ("KRW=X", "원", 1),
+        "달러인덱스": ("DX-Y.NYB", "", 2),
+        "엔/달러": ("JPY=X", "엔", 2),
+        "위안/달러": ("CNY=X", "위안", 4),
+    },
+    "주식": {
+        "코스피": ("^KS11", "", 2),
+        "S&P 500": ("^GSPC", "", 2),
+        "나스닥": ("^IXIC", "", 2),
+        "닛케이": ("^N225", "", 2),
+        "상해종합": ("000001.SS", "", 2),
+    },
+    "원자재·심리": {
+        "WTI 유가": ("CL=F", "달러", 2),
+        "금": ("GC=F", "달러", 1),
+        "구리": ("HG=F", "달러", 3),
+        "VIX 공포지수": ("^VIX", "", 2),
+    },
 }
 
 # ------------------------------------------------------------
@@ -47,9 +65,16 @@ def _get(url):
 
 
 def _yahoo(symbol, period, interval):
-    url = (f"https://query1.finance.yahoo.com/v8/finance/chart/"
-           f"{urllib.parse.quote(symbol)}?range={period}&interval={interval}")
-    return json.loads(_get(url))["chart"]["result"][0]
+    """야후 차트 데이터. 한 번 실패하면 다른 주소로 한 번 더 시도해요."""
+    path = f"/v8/finance/chart/{urllib.parse.quote(symbol)}?range={period}&interval={interval}"
+    last_error = None
+    for host in ("https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"):
+        try:
+            time.sleep(0.3)  # 너무 빨리 연달아 요청하지 않게
+            return json.loads(_get(host + path))["chart"]["result"][0]
+        except Exception as e:
+            last_error = e
+    raise last_error
 
 
 def korea_rate():
@@ -74,16 +99,14 @@ def us_rate():
     def fmt(low, high):
         return {"name": "미국 기준금리", "value": f"{low:.2f}~{high:.2f}%"}
 
-    # 1) 뉴욕 연준 공식 API (키 필요 없음)
-    try:
+    try:  # 1) 뉴욕 연준 공식 API
         data = json.loads(_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json"))
         r = data["refRates"][0]
         return fmt(float(r["targetRateFrom"]), float(r["targetRateTo"]))
     except Exception as e:
         print(f"[미국 기준금리] 뉴욕 연준 실패: {e}")
 
-    # 2) 세인트루이스 연준 FRED
-    def last_value(series):
+    def last_value(series):  # 2) 세인트루이스 연준 FRED
         text = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}")
         rows = list(csv.reader(io.StringIO(text)))[1:]
         values = [r[-1] for r in rows if r and r[-1] not in (".", "")]
@@ -93,50 +116,108 @@ def us_rate():
     except Exception as e:
         print(f"[미국 기준금리] FRED 실패: {e}")
 
-    # 3) 둘 다 안 되면 설정에 적어둔 값
-    return fmt(*US_RATE_FALLBACK)
+    return fmt(*US_RATE_FALLBACK)  # 3) 예비값
+
+
+def format_value(price, unit, digits):
+    if unit == "%":
+        return f"{price:,.{digits}f}%"
+    return f"{price:,.{digits}f} {unit}".strip()
 
 
 def format_change(diff, base, unit, digits):
     """변화량을 보기 좋게: 금리는 bp, 나머지는 값과 % 같이"""
     if unit == "%":
         return f"{diff * 100:+.0f}bp"
-    pct = f" ({diff / base * 100:+.1f}%)" if base else ""
+    pct = f" ({diff / base * 100:+.2f}%)" if base else ""
     return f"{diff:+,.{digits}f}{pct}"
 
 
+def _series(res, time_fmt):
+    """야후 응답에서 (시점, 값) 목록을 뽑아요."""
+    stamps = res.get("timestamp") or []
+    closes = res["indicators"]["quote"][0]["close"]
+    times, values, raw = [], [], []
+    for ts, v in zip(stamps, closes):
+        if v is None:
+            continue
+        times.append(datetime.fromtimestamp(ts, KST).strftime(time_fmt))
+        values.append(round(v, 4))
+        raw.append(ts)
+    return times, values, raw
+
+
 def quote(name, symbol, unit, digits):
-    """현재 시세, 전일 대비 변화, 기간별 추이"""
-    item = {"name": name, "value": "-", "change": None, "trends": {}}
+    """현재 시세, 전일 대비 변화, 5일·3개월 추이(시점 포함)"""
+    item = {"name": name, "unit": unit, "digits": digits,
+            "price": None, "value": "-", "change": None, "trends": {}}
+
+    # 3개월 일별: 현재가와 전일 종가도 여기서 같이 구해요
     try:
-        meta = _yahoo(symbol, "1d", "1d")["meta"]
+        res = _yahoo(symbol, "3mo", "1d")
+        meta = res["meta"]
         price = meta["regularMarketPrice"]
-        prev = meta.get("chartPreviousClose") or meta.get("previousClose")
-        item["value"] = f"{price:,.{digits}f}%" if unit == "%" else f"{price:,.{digits}f} {unit}"
+        times, values, raw = _series(res, "%Y/%m/%d")
+        prev = None
+        if values:
+            # 마지막 막대가 오늘 거래일이면 그 전날이 '전일 종가'
+            off = meta.get("gmtoffset", 0)
+            last_day = datetime.fromtimestamp(raw[-1] + off, timezone.utc).date()
+            now_day = datetime.fromtimestamp(meta.get("regularMarketTime", raw[-1]) + off, timezone.utc).date()
+            if last_day == now_day:
+                prev = values[-2] if len(values) >= 2 else None
+                values[-1] = round(price, 4)
+            else:
+                prev = values[-1]
+        item["price"] = price
+        item["value"] = format_value(price, unit, digits)
         if prev:
             item["change"] = format_change(price - prev, prev, unit, digits)
+        if len(values) >= 2:
+            item["trends"]["3mo"] = {"times": times, "values": values,
+                                     "change": format_change(values[-1] - values[0], values[0], unit, digits)}
     except Exception as e:
-        print(f"[{name}] 현재가 실패: {e}")
+        print(f"[{name}] 시세 실패: {e}")
         return item
 
-    for key, (period, interval) in TREND_RANGES.items():
-        try:
-            closes = _yahoo(symbol, period, interval)["indicators"]["quote"][0]["close"]
-            values = [v for v in closes if v is not None]
-            if len(values) >= 2:
-                item["trends"][key] = {
-                    "values": values,
-                    "change": format_change(values[-1] - values[0], values[0], unit, digits),
-                }
-        except Exception as e:
-            print(f"[{name}] {key} 추이 실패: {e}")
+    # 5일 시간별
+    try:
+        times, values, _ = _series(_yahoo(symbol, "5d", "60m"), "%m/%d %H:%M")
+        if len(values) >= 2:
+            item["trends"]["5d"] = {"times": times, "values": values,
+                                    "change": format_change(values[-1] - values[0], values[0], unit, digits)}
+    except Exception as e:
+        print(f"[{name}] 5일 추이 실패: {e}")
     return item
 
 
+def yield_spread(items):
+    """장단기 금리차 (10년물 − 2년물). 음수면 '역전'."""
+    by_name = {it["name"]: it for it in items}
+    ten, two = by_name.get("미국 10년물"), by_name.get("미국 2년물")
+    if not (ten and two and ten["price"] is not None and two["price"] is not None):
+        return None
+    bp = (ten["price"] - two["price"]) * 100
+    state = "역전" if bp < 0 else "정상"
+    return {"name": "장단기 금리차", "unit": "bp", "digits": 0, "price": bp,
+            "value": f"{bp:+.0f}bp", "change": None, "note": f"10년−2년, {state}", "trends": {}}
+
+
 def get_all():
-    """기준금리 2개, 시장 지표 여러 개를 돌려줘요."""
+    """기준금리와 묶음별 시장 지표를 돌려줘요."""
     rates = [korea_rate(), us_rate()]
-    quotes = [quote(name, *info) for name, info in QUOTES.items()]
-    for it in rates + quotes:
-        print(f"[지표] {it['name']}: {it['value']} {it.get('change') or ''}")
-    return {"rates": rates, "quotes": quotes}
+    groups = []
+    for group_name, quotes in GROUPS.items():
+        items = [quote(name, *info) for name, info in quotes.items()]
+        if group_name == "금리":
+            spread = yield_spread(items)
+            if spread:
+                items.append(spread)
+        groups.append({"name": group_name, "items": items})
+
+    for it in rates:
+        print(f"[지표] {it['name']}: {it['value']}")
+    for g in groups:
+        for it in g["items"]:
+            print(f"[지표] {it['name']}: {it['value']} {it.get('change') or ''}")
+    return {"rates": rates, "groups": groups}
