@@ -21,6 +21,9 @@ KST = timezone(timedelta(hours=9))
 # 금통위에서 금리가 바뀌면 여기 숫자만 고치면 돼요. (2026-08-27 인상 기준)
 KOREA_RATE_FALLBACK = 3.00
 
+# 미국 기준금리 예비값 (하단, 상단): 온라인에서 못 가져올 때만 써요. (2026-09-16 인상 기준)
+US_RATE_FALLBACK = (3.75, 4.00)
+
 # 야후 파이낸스에서 가져올 시세 (표시 이름: (종목코드, 단위, 소수점))
 QUOTES = {
     "미국 10년물": ("^TNX", "%", 2),
@@ -67,18 +70,31 @@ def korea_rate():
 
 
 def us_rate():
-    """미국 기준금리 범위 (미국 세인트루이스 연준 FRED, 키 필요 없음)"""
+    """미국 기준금리 범위: 뉴욕 연준 → FRED → 예비값 순서로 시도해요."""
+    def fmt(low, high):
+        return {"name": "미국 기준금리", "value": f"{low:.2f}~{high:.2f}%"}
+
+    # 1) 뉴욕 연준 공식 API (키 필요 없음)
+    try:
+        data = json.loads(_get("https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json"))
+        r = data["refRates"][0]
+        return fmt(float(r["targetRateFrom"]), float(r["targetRateTo"]))
+    except Exception as e:
+        print(f"[미국 기준금리] 뉴욕 연준 실패: {e}")
+
+    # 2) 세인트루이스 연준 FRED
     def last_value(series):
         text = _get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series}")
         rows = list(csv.reader(io.StringIO(text)))[1:]
         values = [r[-1] for r in rows if r and r[-1] not in (".", "")]
         return float(values[-1])
     try:
-        low, high = last_value("DFEDTARL"), last_value("DFEDTARU")
-        return {"name": "미국 기준금리", "value": f"{low:.2f}~{high:.2f}%"}
+        return fmt(last_value("DFEDTARL"), last_value("DFEDTARU"))
     except Exception as e:
-        print(f"[미국 기준금리] 실패: {e}")
-        return {"name": "미국 기준금리", "value": "-"}
+        print(f"[미국 기준금리] FRED 실패: {e}")
+
+    # 3) 둘 다 안 되면 설정에 적어둔 값
+    return fmt(*US_RATE_FALLBACK)
 
 
 def format_change(diff, base, unit, digits):
