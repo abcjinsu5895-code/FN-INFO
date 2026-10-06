@@ -32,7 +32,7 @@ US_RATE_FALLBACK = (3.75, 4.00)
 GROUPS = {
     "금리": {
         "미국 10년물": ("^TNX", "%", 2),
-        "미국 2년물": ("2YY=F", "%", 2),
+        # 미국 2년물은 야후에 믿을 만한 데이터가 없어서 미국 재무부 공식 데이터로 따로 가져와요.
     },
     "환율": {
         "원/달러": ("KRW=X", "원", 1),
@@ -120,6 +120,8 @@ def us_rate():
 
 
 def format_value(price, unit, digits):
+    if unit == "bp":
+        return f"{price:+.0f}bp"
     if unit == "%":
         return f"{price:,.{digits}f}%"
     return f"{price:,.{digits}f} {unit}".strip()
@@ -129,6 +131,8 @@ def format_change(diff, base, unit, digits):
     """변화량을 보기 좋게: 금리는 bp, 나머지는 값과 % 같이"""
     if unit == "%":
         return f"{diff * 100:+.0f}bp"
+    if unit == "bp":
+        return f"{diff:+.0f}bp"
     pct = f" ({diff / base * 100:+.2f}%)" if base else ""
     return f"{diff:+,.{digits}f}{pct}"
 
@@ -191,28 +195,74 @@ def quote(name, symbol, unit, digits):
     return item
 
 
-def yield_spread(items):
-    """장단기 금리차 (10년물 − 2년물). 음수면 '역전'."""
-    by_name = {it["name"]: it for it in items}
-    ten, two = by_name.get("미국 10년물"), by_name.get("미국 2년물")
-    if not (ten and two and ten["price"] is not None and two["price"] is not None):
+TREASURY_URL = ("https://home.treasury.gov/resource-center/data-chart-center/interest-rates/"
+                "daily-treasury-rates.csv/{year}/all?type=daily_treasury_yield_curve"
+                "&field_tdr_date_value={year}&page&_format=csv")
+
+
+def treasury_curve(days=66):
+    """미국 재무부 공식 국채 금리 (2년물, 10년물 일별 종가). 키 필요 없음."""
+    rows = []
+    this_year = datetime.now(KST).year
+    for year in (this_year, this_year - 1):
+        try:
+            text = _get(TREASURY_URL.format(year=year))
+            for r in csv.DictReader(io.StringIO(text)):
+                try:
+                    d = datetime.strptime(r["Date"], "%m/%d/%Y")
+                    rows.append((d, float(r["2 Yr"]), float(r["10 Yr"])))
+                except (KeyError, ValueError):
+                    continue
+        except Exception as e:
+            print(f"[재무부 금리] {year}년 실패: {e}")
+        if len(rows) >= days:
+            break
+    rows = sorted(set(rows))[-days:]
+    if len(rows) < 2:
         return None
-    bp = (ten["price"] - two["price"]) * 100
-    state = "역전" if bp < 0 else "정상"
-    return {"name": "장단기 금리차", "unit": "bp", "digits": 0, "price": bp,
-            "value": f"{bp:+.0f}bp", "change": None, "note": f"10년−2년, {state}", "trends": {}}
+    return {
+        "times": [d.strftime("%Y/%m/%d") for d, _, _ in rows],
+        "y2": [y2 for _, y2, _ in rows],
+        "y10": [y10 for _, _, y10 in rows],
+        "last_date": rows[-1][0].strftime("%m/%d"),
+    }
+
+
+def _daily_item(name, times, values, unit, digits, note):
+    """일별 데이터만 있는 지표 칸 (5일 그래프는 최근 6거래일 일별)"""
+    item = {"name": name, "unit": unit, "digits": digits, "price": values[-1],
+            "value": format_value(values[-1], unit, digits), "note": note, "trends": {}}
+    item["change"] = format_change(values[-1] - values[-2], values[-2], unit, digits)
+    short = [t[5:] for t in times[-6:]]  # MM/DD
+    item["trends"]["5d"] = {"times": short, "values": values[-6:],
+                            "change": format_change(values[-1] - values[-6], values[-6], unit, digits)}
+    item["trends"]["3mo"] = {"times": times, "values": values,
+                             "change": format_change(values[-1] - values[0], values[0], unit, digits)}
+    return item
+
+
+def treasury_items(curve):
+    """2년물 칸과 장단기 금리차 칸 (둘 다 재무부 같은 날 종가 기준)"""
+    if not curve:
+        return []
+    note = f"{curve['last_date']} 종가, 미 재무부"
+    two = _daily_item("미국 2년물", curve["times"], curve["y2"], "%", 2, note)
+    spread_bp = [round((a - b) * 100, 1) for a, b in zip(curve["y10"], curve["y2"])]
+    state = "역전" if spread_bp[-1] < 0 else "정상"
+    spread = _daily_item("장단기 금리차", curve["times"], spread_bp, "bp", 0,
+                         f"10년−2년, {state}, {curve['last_date']} 종가")
+    return [two, spread]
 
 
 def get_all():
     """기준금리와 묶음별 시장 지표를 돌려줘요."""
     rates = [korea_rate(), us_rate()]
+    curve = treasury_curve()
     groups = []
     for group_name, quotes in GROUPS.items():
         items = [quote(name, *info) for name, info in quotes.items()]
         if group_name == "금리":
-            spread = yield_spread(items)
-            if spread:
-                items.append(spread)
+            items += treasury_items(curve)
         groups.append({"name": group_name, "items": items})
 
     for it in rates:
@@ -220,4 +270,4 @@ def get_all():
     for g in groups:
         for it in g["items"]:
             print(f"[지표] {it['name']}: {it['value']} {it.get('change') or ''}")
-    return {"rates": rates, "groups": groups}
+    return {"rates": rates, "groups": groups, "curve": curve}
