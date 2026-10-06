@@ -23,7 +23,7 @@ CURVE_BP = 5        # 2년물과 10년물 변화 차이가 몇 bp 이상이면 �
 # 상태 이름
 #   up / down / flat / big_up / big_down
 #   not_up(오르지 않음) / not_down(내리지 않음)
-#   "커브": bear_flat / bear_steep / bull_steep / bull_flat
+#   "커브": bear_flat / bear_steep / bull_steep / bull_flat / twist_steep / twist_flat
 #   "장단기 금리차": inverted / normal
 #
 # tone: warn(경계) / good(우호) / info(참고)
@@ -45,6 +45,14 @@ RULES = [
      "title": "장기 성장 기대 약화",
      "say": "장기금리가 단기금리보다 더 많이 내렸어요. 안전자산 선호가 커지거나 장기 경기 전망이 어두워지는 흐름일 수 있어요.",
      "watch": "주가와 VIX가 같이 흔들리는지"},
+    {"when": {"커브": "twist_steep"}, "tone": "warn",
+     "title": "단기↓ 장기↑ 엇갈림",
+     "say": "2년물은 내리는데 10년물은 오르고 있어요. 단기적으로는 긴축 부담이 줄었다고 보면서도, 물가나 재정 적자 걱정으로 장기금리가 버티는(오르는) 흐름이에요. 장기금리 부담은 주식과 대출금리에 계속 압력이에요.",
+     "watch": "미 국채 입찰, 재정 관련 뉴스, 기대인플레이션"},
+    {"when": {"커브": "twist_flat"}, "tone": "warn",
+     "title": "단기↑ 장기↓ 엇갈림",
+     "say": "2년물은 오르는데 10년물은 내리고 있어요. 당장은 긴축 기대가 커지지만 그게 장기 경기를 누를 거라고 시장이 보는 흐름이에요.",
+     "watch": "역전 여부, 경기지표"},
     {"when": {"장단기 금리차": "inverted"}, "tone": "warn",
      "title": "장단기 금리 역전",
      "say": "10년물 금리가 2년물보다 낮아요. 과거 경기침체에 앞서 자주 나타난 신호지만, 역전 후 침체까지는 시차가 길고 예외도 있어요.",
@@ -212,6 +220,8 @@ def build_states(indicators):
     info = {}
 
     for name, it in items.items():
+        if name == "장단기 금리차":
+            continue
         tr = it.get("trends", {}).get("3mo")
         if not tr:
             continue
@@ -240,10 +250,12 @@ def build_states(indicators):
     if spread and spread.get("price") is not None:
         states["장단기 금리차"] = "inverted" if spread["price"] < 0 else "normal"
 
-    # 커브 모양 변화 (2년물과 10년물의 5일 변화 비교, bp)
-    if "미국 10년물" in info and "미국 2년물" in info:
-        d10 = info["미국 10년물"]["diff"] * 100
-        d2 = info["미국 2년물"]["diff"] * 100
+    # 커브 모양 변화: 미 재무부 같은 날 종가로 2년물·10년물 5거래일 변화 비교 (bp)
+    curve_data = indicators.get("curve")
+    if curve_data and len(curve_data["y2"]) > WINDOW:
+        d2 = (curve_data["y2"][-1] - curve_data["y2"][-1 - WINDOW]) * 100
+        d10 = (curve_data["y10"][-1] - curve_data["y10"][-1 - WINDOW]) * 100
+        start = curve_data["times"][-1 - WINDOW][5:]
         curve = None
         if d2 > 0 and d10 > 0:
             if d2 - d10 >= CURVE_BP:
@@ -255,9 +267,13 @@ def build_states(indicators):
                 curve = "bull_steep"
             elif d2 - d10 >= CURVE_BP:
                 curve = "bull_flat"
+        elif d2 <= 0 <= d10 and d10 - d2 >= CURVE_BP:
+            curve = "twist_steep"
+        elif d10 <= 0 <= d2 and d2 - d10 >= CURVE_BP:
+            curve = "twist_flat"
         if curve:
             states["커브"] = curve
-            info["커브"] = {"text": f"2년물 {d2:+.0f}bp, 10년물 {d10:+.0f}bp"}
+            info["커브"] = {"text": f"{start}→{curve_data['last_date']} 종가: 2년물 {d2:+.0f}bp, 10년물 {d10:+.0f}bp"}
     return states, info
 
 
@@ -283,6 +299,8 @@ def _evidence(name, m):
         return None
     if m["unit"] == "%":
         move = f"{m['diff'] * 100:+.0f}bp"
+    elif m["unit"] == "bp":
+        move = f"{m['diff']:+.0f}bp"
     else:
         move = f"{m['diff'] / m['base'] * 100:+.1f}%" if m["base"] else f"{m['diff']:+.2f}"
     return f"{name} {WINDOW}일 {move} (평소 움직임의 {abs(m['z']):.1f}배)"
