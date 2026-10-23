@@ -1,52 +1,52 @@
 {
- "date": "2026-10-23",
- "updated": "10월 23일 08:20",
+ "date": "2026-10-24",
+ "updated": "10월 24일 08:18",
  "korea": [
   {
    "topic": "금리",
-   "title": "한은, 기준금리 3.00% 동결…경기·물가 흐름 주시",
-   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE82aHRxaldyVzRjOU5GT1Q0YThkUG5NVEU3RzFIWWUxXzZ0TUdzZ3hSZnhqS2lzekhaN2tDMnVCWHhRbFk3alNmS1ltSUhUenJDYm96VUZUZEY0dw?oc=5",
-   "source": "브릿지경제",
-   "time": "10/22 13:41"
+   "title": "\"한은, 11월 기준금리 3.25%로 올릴 것…성장·물가 전망 상향 예상\"",
+   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9QNXRoMTQzcXI2WmRQTlpTbmpKRjh2OWRWQ21yQmZGTWNQWjZkdnoxX2JtVFlfVG5HdjhoRXpCQkw3bTVyMVB3Qk93MDA5MEZoXzQwUDdadHd6Nk9KYmVvbVExa2JtTVB0OUE?oc=5",
+   "source": "중기이코노미",
+   "time": "10/23 12:02"
   },
   {
    "topic": "연준",
-   "title": "[속보] 한국은행 기준금리 3.00% 유지…미국 연준 행보도 변수",
-   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBLekVKbUxkQnZuMG40RE5CTUF4Zkt3UHNmUmxmMnV0UUU0RXZJdk1WdmRPdkczcDRpWWg4Z0puU3Fka0MxVmNjcHpCTUE4VTJoT0RRbVpjd1hvdzhKVlVKN0xUWXJXZ0pG?oc=5",
-   "source": "CBC뉴스",
-   "time": "10/22 10:02"
+   "title": "비트코인 8만 5,000달러 돌파 실패…연준 FOMC 앞두고 8만 달러 무너지나?",
+   "link": "https://news.google.com/rss/articles/CBMiSkFVX3lxTFAwTmM2MkZCR2E0V2lMemNnb2lGM2RUOGZfYVJBZktDSUZlZm1TQjdWOHllRy1ZemFlTUZsdVI0VGxscGQzelBGWkN3?oc=5",
+   "source": "코인리더스",
+   "time": "10/24 07:37"
   },
   {
-   "topic": "물가",
-   "title": "한국은행, 기준금리 3.00% 동결…물가·금융안정 점검하며 추가 인상 검토",
-   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5Yeml5Vk5Rd2xYSm5qVGFKMURhaDJHYWZBMWp5ZVEwOENiQUlXcVBYaUlEWVMyQmU5NlN3SmZheE9vUGk4QTlEdWRaOGpBYmpsVHUtOXpZOHZQVTNVQ2p6NNIBYEFVX3lxTE5Yeml5Vk5Rd2xYSm5qVGFKMURhaDJHYWZBMWp5ZVEwOENiQUlXcVBYaUlEWVMyQmU5NlN3SmZheE9vUGk4QTlEdWRaOGpBYmpsVHUtOXpZOHZQVTNVQ2p6NA?oc=5",
-   "source": "토큰포스트",
-   "time": "10/22 12:03"
+   "topic": "성장",
+   "title": "“다음주 미 연준 기준금리 공시, ‘성장 전망’에 주목해야”",
+   "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE5YcWdCSlBZQkZHUWw1VHJDUDlrRnlKb1dIQkNmLUpGamhWMURnZVZRYjFJajBwVkdTbzBLamRidVZzd3lvSkg5VkVkay1oV2xvRWJBUjBPME95N0ZOVFE?oc=5",
+   "source": "뉴스투데이",
+   "time": "10/23 09:32"
   }
  ],
  "world": [
   {
-   "topic": "금리",
-   "title": "US dollar slips as Treasury yields fall ahead of Federal Reserve meeting",
-   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPS3VvdFduY2NnVnBEaWFlV3J2OS1sc1ZwWmVKam03SHo4TmNKTlJ5YnRUcWhQS3hQUGo5T0Y2dlg4TXl6aEJFQzI3cHdjWTI2NWNZM3JZeU9na0ZOSW1iX1lWNlR0QTlRVjFPVTI0Ql9yS1A1U1J0dnQxTGYtTkNpbFpvWXFqT0JWblBqMlVUQ182ODhzQTJWVUlnYW91NnllVWExdmE1Wng0Nzh5QUhwUFpxZ2JnOVE2aS1oZ1IzY25zZzJxNmQ4TnBn?oc=5",
-   "source": "Economies.com",
-   "time": "10/22 15:18"
+   "topic": "중앙은행",
+   "title": "Japan Inflation Returns Above 2% Target, Strengthening Case for Further BOJ Rate Hikes",
+   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQNkVIU0w2N3Nub1o0aHlkODhVUTMzbzJuWnVwLXdNa1Z6NFJ5SEFkWnpUcW1qQllGVXBiRTRPY2tVMFZEX1MyT1NJLVNaUEVDU3B1UzYyejdKdTBDeHl4MVhMMHhzcmhoZVBObTBfN0VKWVphR1ppQ0ZwemptamJoa1lwamV5SGd0WDlpT1Ewcy1KU0RONjA5cGlIWXJ1Q0RfMWZhV2Rza25UMmlrN1E?oc=5",
+   "source": "Tekedia",
+   "time": "10/24 03:00"
   },
   {
-   "topic": "환율",
-   "title": "Dollar pause steadies currency markets before Fed, ECB and BOJ rate decisions",
-   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQMkktb3pna251ckluZm9HV0NkOC1YV19nVFVWWUVQcjdXNXJRTktWVjE1Ylllb3o1RGowX05BWjg5ZTY0aWN3cWlVUWFVVGsxNlN5MlA5ZU51RGRZLVU0Y0k1ay01NUtuY0h3SFlDd092N1pwdWwzcWFSeF9pX0xId3c1WEd5c1M1T3A1aXZwVmJ1TkVoV1VZdjByUEdfRlFCell2b0xR?oc=5",
-   "source": "Traders Union",
-   "time": "10/22 11:24"
+   "topic": "금리",
+   "title": "The Federal Reserve's Latest October Inflation Forecast Has Arrived, and It's Terrible News for Wall Street",
+   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOZlFWWHJZVmpuZkFFV2QwZW4zN1I3MXFzdDNfZjMxdUdSdkpPejZSQldLM2NHN2pINFhsYTFkNWJrNnB0emZLNzZUd1l1b1Q1REdtRHBTR2N1VlVpVzR1ZnlhVlRxRl8xQjdtWURlcG5RdjB2c2xuTVVURDJVV1NGZXg2bXNuVGwtMEpDR3BkalNZMmRpZjZVY3RlX1RXOTlhZEJUemRyeml2d0Zldm1HUTlVdG5tU0xDbUxUQkhzQUhYNFdlZ3lWOWF3?oc=5",
+   "source": "The Motley Fool",
+   "time": "10/23 18:06"
   },
   {
    "topic": "물가",
-   "title": "The Fed’s Dilemma: Can Markets Damp Inflation or Is Another Rate Hike Necessary?",
-   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNdWN5TzJiNG5XMFJvcTdNbUxMTHd2MllzY05iR0V4UklVV20wRTYtMlZ1YzVSQkwyZ2p5OFkxNFNTM19DVjhFZTI3UkdESFJkMm5CSFV5cXVqR0VkYk5jZzdiZ2c4VUEtcVJ2eFZHTjdDUVhnSVRzMVBodGQ2YkZmcF9vZXJfQQ?oc=5",
-   "source": "Barron's",
-   "time": "10/22 21:56"
+   "title": "What To Expect From Wednesday’s Federal Reserve Meeting",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQR1g1MjJqM1A4WVk0SHlYMjhTTjRnZk1rdWZSeVh6QnBmbkhqeEFLMS1uQXN3OVB0VEhCMElnak05UFRLRkV2VVlmVno1YzAyOXFXbS1BanllLVRVUkI2eXI1LWRvcDd1M05nWGtLcmtwTHpjQWw0SkNDdkxhWkxiODNWek9CWmV4Mm81dTRHOTFfczJVYzRZ?oc=5",
+   "source": "Investopedia",
+   "time": "10/24 04:18"
   }
  ],
  "insight": null,
- "insight_time": "23:28"
+ "insight_time": "08:18"
 }
