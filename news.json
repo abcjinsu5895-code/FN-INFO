@@ -1,52 +1,52 @@
 {
- "date": "2026-11-05",
- "updated": "11월 05일 09:42",
+ "date": "2026-11-06",
+ "updated": "11월 06일 09:43",
  "korea": [
   {
    "topic": "금리",
-   "title": "물가 2.8%·성장률 1.0%…한국은행, 11월 기준금리 3.25% ↑가능",
-   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBWaUtucWV5VlUyd1NTWk1JeFpwblhDYjZSSFpQclpuVFpIV2c0ZHBydlcyVHZjVy0zTnU4WkkwakNGTkRhZ0VZaXJLdTJXc2FfazJsdGdMY1B2QWZSR285OXNzTDFmZlZpOFE?oc=5",
-   "source": "OBC 뉴스",
-   "time": "11/04 09:55"
+   "title": "달러·국채금리 하락에 금값 2주 만에 최고…미 연준 금리 향방 주목 : 금융",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTFByUmhtaEREQ1YzU09SczlvMEFlbEhaeUtxMUMtN1pHdldLSjJPb0RuOHZWSTd1UFlmSWN5MVJ6Rnh3Wk8zZkk5LUJhVQ?oc=5",
+   "source": "재경일보",
+   "time": "11/06 08:00"
   },
   {
-   "topic": "환율",
-   "title": "원·달러 환율, 1345.0원…달러, 美 국채금리 하락 속 약세",
-   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5CZl9GcGxyZDY5UmpvRG1lQXdUWmdVSlVRUkdtNEZyS2xYUWtXaHRYTE1JQUpVc2l5Mll2WVV4ZUxvU0RsNjhhZElsZ2RJVi16QTNyTC10cDBWVU8weFlCdEhwY1pIWUdQdzR2OF9WTQ?oc=5",
-   "source": "조세일보",
-   "time": "11/05 08:24"
+   "topic": "연준",
+   "title": "10월 고용 보고서 전망: 6만5,000개 일자리 예상, 연준 금리 인상 확률 67% - 뉴스 및 통계",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxQenVySm9pMG8xZGp0eHlOQWROai1kaEhvaE5ySUFSX19POE81RlIzdmRqOGlOV0hraVptN2RmeEhFU1dmSmpDajFjZEwtY0NKbFpzRkszNVdHeDVZRnhlbWRrbDRpSGtTeHRwRXBmZmR6bFJxQURocXM5d0ttdlFNZ1dPdmpvMU9BMGpHYW90T0xGRmlmaVVfcmQzQnNlNXdaSk43YXZfeWJ6c0s0U2Y1V09DOElTRXRK?oc=5",
+   "source": "IndexBox",
+   "time": "11/06 06:40"
   },
   {
-   "topic": "성장",
-   "title": "美 국채 금리, 하락 어렵다…'명목GDP 10%+고용 호조' |",
-   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE9PZnA0VzZUcUJuZG5KZ0hWNzVNTmNPQlN0N2FPazBkbFdBX25FRXk0VnZFZlBjcVJpTU1DdGtTR0s1SkYwaFpCaWN5ZEYzMUZVTDEyWnpsT3M1ZW1mV0ZjdDlfcnpjTHA4SzJJQ0NvRGd2Y29C?oc=5",
-   "source": "연합인포맥스",
-   "time": "11/04 12:29"
+   "topic": "물가",
+   "title": "체코 중앙은행, 근원 인플레이션 지속으로 기준금리 4%로 인상",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1mbUpWMkJhUHY0Qkd3SUVzQVlWZExKR1ZCTW1CZzJ4NWptaFBuRGxYd2dLanpFcThxUlVubHpHM3AyR29QUmdZaG5renhDVlcwaDZBUms4VV9sN0ItWjlUdVVFUUxCaFU?oc=5",
+   "source": "Investing.com 한국어",
+   "time": "11/05 23:44"
   }
  ],
  "world": [
   {
+   "topic": "금리",
+   "title": "Federal Reserve holds interest rates steady as inflation and consumer debt remain concerns",
+   "link": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPY241ODBrZ3VXak1ubmpXalpIREpnNEVSN1ZNWDFNN3B0YVZDX3RWcFpsbXVlbVQ1S1NMWnFnNE9HMTBzN0Y3b0VQZndYd0hTb2pIeEtsaWJQa0MyX1o4YXNGcW1SbzhXUm82MDV3YW1zcmJPOG5JdWo0VTJ0UEV1eWZrckJBbWhNT3pwMWpnNzlDdS0tSUtkdVNFUm1SQ3lZeEE?oc=5",
+   "source": "Spectrum News",
+   "time": "11/06 04:00"
+  },
+  {
    "topic": "물가",
    "title": "Eurozone Inflation Rises to 4%, Boosting Case for ECB Interest Rate Hike in December",
-   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxNcWVOTU84Tk40OGpBSG1CMDFqaHI0NERCMTNQb29CRGw1dlM1VU56UHlOaTdvZk14UkpGeTNva3hHRjNNNUlIdHp3ZWlGZUlYeGlCWkFFcnNBM0F5Vm1PRWlDQ2pCUlRrYW9GVTFZRDQtekpQQ2JOdmJPXzlxdzNiaXZ6Y0d6Sl91QU9rV0ZlUDAxRE1ZM1hUOGk2d2VySkVjeXN6R0w4Vkp0V3VrME5NZlFRVFBjOWRV?oc=5",
+   "link": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxPYWZYVF80Z2F6VFlLTUlPUEgydktTWk5jNGJXUG1qTmxCV2hhb0JrZTBYRzZMU04zOGtZSGVlS244R2tQUjZ0YUUxXzdlR2JVZ3pWUmthNkdHT1daQ1NZYkgxRkE4NFVXVDNaaURkdmo2eWsyVHdCY2FWUVVWcjE3cmlPVGd4N1ZkTkJ1c2ZMd0FyblFfT3BnOXg3dEEyYUhSakcwUFNmX1BrZk9EOGM2U21XbV80T2NV?oc=5",
    "source": "Morningstar",
-   "time": "11/04 20:50"
+   "time": "11/05 17:44"
   },
   {
-   "topic": "금리",
-   "title": "Will the Federal Reserve’s Rate Hike Derail Bank Funding Cost Gains?",
-   "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQd3hHLXIxeDgtdS1jaHFhRmNhbFRoWUFHQ0drUS1sLTRoLW1PU09hNVVDdUY3bkltblFHbUlWOUVOTThxQVByZ3MyakZNZ1hUZG9seUlvNmtubE5SS2dTeGQzTUhkWUlvVnZwdjVvWWxGdGF0UWxjMWZVY1BHVE1ZU3B2U1dET3FLSm5weWN3QnpvdlJUaHNWOHY5Y05rcHkxalZ4MGlLYjFkdVNuVk9odTR2ZTZ0U0QzQ3NF?oc=5",
-   "source": "KBRA",
-   "time": "11/05 01:00"
-  },
-  {
-   "topic": "중앙은행",
-   "title": "Bank of Japan signals December rate hike after inflation reaches 2.1%",
-   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQN2VKUXN4dXBKWERfTk5UOVJGQzZDZFhCRnlnVF94VnJlWUp0SjYzaDNwVEN3NjhkcFQ0ZWFhRFhJX25yWURvSnFzY1hTdkJld3k5YTR0VGtyVEJOUFNDek8wZ0dwT1cyclNvN2tTUkloQ2J1dXZJRjJoSjl4STdxb2pVYU9tVHdtVGpLWm5GX3JMTTNwR3NCaWNSaUVWbkVOUTNSYQ?oc=5",
-   "source": "Equiti Global",
-   "time": "11/05 06:17"
+   "topic": "고용",
+   "title": "October Jobs Report Preview: 65K Jobs Expected, Fed Rate Hike Odds at 67% - News and Statistics",
+   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxQV2llX2xPRVd3bGFCZ2pMcHFiWnByRktuVmc2NWpyS091T0xtY2o4cmJUODhfZXNMV3VabDN4cVR2LWNZV3NDdEExZjAyZEhRMTJNdHZXWnV1RmVBMk1SclZncGJySnR1REdZWDQ0a29VNFN4cDh3eXVuLUllQzFDYXJpWUdmMDhTcFFaYVdaeVozeWFFRjl1czlGX25Ud3pBX1J1b0x4WGxENGItSWFzNUdodEw?oc=5",
+   "source": "IndexBox",
+   "time": "11/06 06:40"
   }
  ],
  "insight": null,
- "insight_time": "17:55"
+ "insight_time": "09:43"
 }
