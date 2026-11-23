@@ -1,52 +1,52 @@
 {
- "date": "2026-11-23",
- "updated": "11월 23일 09:34",
+ "date": "2026-11-24",
+ "updated": "11월 24일 07:26",
  "korea": [
   {
-   "topic": "금리",
-   "title": "물가 상승·성장률 상향 조정… 한은, 기준금리 3.25%로 올리나",
-   "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE4xeGtjRHVUcG12VXpScWZIMkJ2QkpuZHF4RUVZWjZ1N1pWLXVmemd2NXlDM1dOYTQtRHdZelZTNW1aTVdLQUtfWnlXM2duQWRu0gFUQVVfeXFMT3F0amo2bXZSaWpwUWN1dzNWQ05pX0I1djNYd1FuU3hrRXlVOC1RMFBaaVZBSjFxTWp3d2FQdFhDN2Q3c0VUZUg1cVdZTmdGTVAxQnBj?oc=5",
-   "source": "세계일보",
-   "time": "11/22 15:27"
-  },
-  {
-   "topic": "물가",
-   "title": "한은, 26일 기준금리 결정…성장률 상향·물가 부담에 인상 무게",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBzWU5YOTJMTGpHUS15SGRNRWU5RHZkQ0Vfa0x6V0p4N2tva3cyenlGNXhPX3RZaUVmVjhGalRFQnR6aVFMaGdBWkxuUkVhZ1ZJMWF2UFctWWVxMWxNeU9mRzYxMnBhek1sdzMw0gFrQVVfeXFMUHNZTlg5MkxMakdRLXlIZE1FZTlEdmRDRV9rTHpXSng3a29rdzJ6eUY1eE9fdFlpRWZWOEZqVEVCdHppUUxoZ0FaTG5SRWFnVkkxYXZQVy1ZZXExbE15T2ZHNjEycGF6TWx3MzA?oc=5",
-   "source": "SR타임스",
-   "time": "11/22 11:38"
-  },
-  {
    "topic": "성장",
-   "title": "한은, 금주 금리 인상 전망…경제 성장률↑, 물가 잡히지 않아",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9FdlJXUUdiVlY4dVphQnV3RkxWRjc5RldmaUtUU0J4NHVDRV9HZThMeEVhaVVIOGthUkoybGRQOEFMNEZoaG9NOU1zRUxEQnZtejdwYVY3MWdJZ3B3RWJQZVU5eU1FRGlqeG11QWY4bTk?oc=5",
-   "source": "산경일보",
-   "time": "11/22 14:39"
+   "title": "3분기 GDP 1.0% 성장·10월 물가 2.8%…한은, 올해 성장률 전망 높일까",
+   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE15R2lNR2FVNzhCZW00OXMtRlJkckR4ZmZXUXhvajNxSy1hbHlEQ1RKNzNpOHdqeUwzcllwYVMwdXdhOWRWdjh5Tkk0YzZLNG9XVExROFM0QmtXNElUZ21DQWt2YjlyY3BTY2c?oc=5",
+   "source": "nbn 시사경제",
+   "time": "11/23 14:16"
+  },
+  {
+   "topic": "금리",
+   "title": "한은 11월 기준금리 3.25%로 인상 유력…전문가 14명 전원 ‘인상’ 전망",
+   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1NdFhRanJpYVZueVpONUFvQTk5V0ZSdURCSHUzTjQzelNtWU4xdERldElqVDF5TGtyeHBOOV84RVJCS0FVVGtQLU5ZQ3BVUVdiNDF2bFVwcWU5SWp1N2JleUJ1dTZxTGlZaWpWdllVOXI?oc=5",
+   "source": "https://www.thedailyeconomy.kr/",
+   "time": "11/23 17:52"
+  },
+  {
+   "topic": "연준",
+   "title": "빌 애크먼, 연준 금리 인상이 대규모 경기 침체를 촉발할 것이라고 경고",
+   "link": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxPT003SWswaUJiVXhMMm5jQ2U4VlFjNDhJVWFkeFhsWTJqbk1TSTFzYkF1UWRxbExpVC1xZWc1ZHg4TVFUd3htbEFiVjRYY2x2a2lZYVJGTkNTZ1RVYmhrMW9aT1lKdzc0UlpnRDl6VldpUkFhdHFnVW5ONnNlM0hlc1lmZXNmdHVSMXBHRUlzeEp5VEdlNnRHUVlQNV93YTUtaFNZeWtMaGo3M1VmalFoY25wOUI2MlZFVGsxeXFtaGNzc0NzZy03UDFTMC1NUGVVY1E?oc=5",
+   "source": "Bitcoin News",
+   "time": "11/23 20:32"
   }
  ],
  "world": [
+  {
+   "topic": "물가",
+   "title": "Apple rises as robust inflation and Fed talk keep risks from higher Treasury yields in focus",
+   "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxQM05hZVVidmtYQy1BMXU5cy1UZXVab3FFQUE5cmlXUENIRHRSYldzNGFJS1RVWEdZSXVWVUpfdVg5TzdFcDJ1SjA2Z01SQVRWWnpZUVBqYnF4cWRndEtfWm55b19KZ2lQMzZ5SXBqYnU1ZzBmbHBEZzZadXRzdHdBY0drSUx5TWxhZWs1YUhMTC0wX1Ux?oc=5",
+   "source": "Traders Union",
+   "time": "11/24 04:32"
+  },
+  {
+   "topic": "금리",
+   "title": "Federal Reserve signals higher rates over time as inflation stays above target",
+   "link": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOUlhoVnNzOV96M0pNN01qOGZiMm90Znd5YkZsYzdSZXF1Y1VlV2lMODhzOHYwaEQtOFFyTDhiTUhMUlc2b1prczJJLU9CdnhhME9UV25fTFZ1NWxWOGg1eDZ5Q3VWeTVZcE12MlRrTzdrVmZIdlNOUGRfcHBQaVptbVZmdXpVc3c2VjctRzM5SUhHeHRaTUU3dg?oc=5",
+   "source": "Traders Union",
+   "time": "11/24 06:24"
+  },
   {
    "topic": "중앙은행",
    "title": "Japan Faces Rising Inflation Data as BOJ Eyes December Rate Hike",
    "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxNd0V5VnFGcjQzNnV4YlNKU2llQnBkaklfeFJSYlVwR1BabU5ocjJEUmgyVzFfdHo1ajJXbkNrOXZidVNzYUFNNGZOUmF3d1BtZncwSWR1VXlnRnYwOXJjTTBXVzQzNWc5MlVlSVhWWkwxcFd5NnB2dnBtU0tidkhwUEdsQnZYekFsaExTTTZuNldUZko5azV2TEg5NA?oc=5",
    "source": "JournalArta",
    "time": "11/23 08:32"
-  },
-  {
-   "topic": "물가",
-   "title": "Fed's Cook Makes Case for More Rate Hikes to Lower Inflation",
-   "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNakh1MkpvZXlraVpBckhKQzFhM1BFN1pMU2dQNmVyS3lNYlNrbUpMZktHb1ppMFZpLTVvSi1DYlJBTWN4X1BQT2g3NHNTMk1za0g1UXRkWnN6Y2pUUkxyV0xiR3RNam5tYi0yV2EzbGEyRWJkVEd6dnN4OVhsTlBjTFdpeDRjbHJaVXBtVmVkWnFwYkZSQ1BOcUFDTHY1Zw?oc=5",
-   "source": "kalkine.com",
-   "time": "11/23 02:39"
-  },
-  {
-   "topic": "금리",
-   "title": "Bitcoin Steady as Fed Keeps Interest Rates Unchanged Following FOMC",
-   "link": "https://news.google.com/rss/articles/CBMirgFBVV95cUxQSWVrMTRXWGRGcjNQclBocllNYkdpcTFqblc0UDV0cTZRT25rT2JyR3RWak9WcUd4YTJMVS1Fa3lOclhLdHBBWktESlVqTzBzRXEtOV92NFkzbm0tTUVVOF9Rb3BJY3F4STIwNFVSb2paVmZzMHBjYzR4RWhVN3dIY2tHcXJXVUx1VzNwQng4Z1ZuMWZDXzZwZ3Y3WUlEZ0o2UU9SMC1xbFlRN0Vvd2c?oc=5",
-   "source": "CoinMarketCap",
-   "time": "11/22 16:52"
   }
  ],
  "insight": null,
- "insight_time": "19:15"
+ "insight_time": "07:26"
 }
